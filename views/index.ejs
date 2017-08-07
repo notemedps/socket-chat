@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script  src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<title>Socket Chat</title>
+	<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js'></script>
+	<script>
+	$(function(){
+		var me ='';
+
+		$('#sub').on('click',function(e){
+					e.preventDefault();
+					 me = $('#user').val();
+					 if(me!=''){
+
+					 	$('#ask').fadeOut();
+					 	$('#main').fadeIn();
+					 	socket.emit('new user',me);
+					 	
+					 }
+					 else{
+					 	alert('Empty username');
+					 }
+					 
+				});
+	
+		if( me ==''){
+			$('#ask').show();
+			
+			
+
+		}
+		
+			socket = io.connect('localhost:3030/chat');
+			
+		socket.on('online',function(data){
+			$('#opl').html(' ['+data.length+']');
+			var online='';
+			for(i=0;i< data.length;i++){
+				if(data[i]==me){
+					data[i]='<b style="color:#fb8c00">'+data[i]+'</b> <small> (you)';
+				} 
+
+				 online+= '<li>'+data[i] +' </li>';
+				
+			}
+			$('#ousers').html(online);
+		})
+
+	
+		
+		
+
+		
+
+
+
+		$('#msgs').on('click',function(e){
+			
+			e.preventDefault();
+			
+			var mess;
+			 mess = $('#msg').val();
+			
+				
+			if(mess!=''){
+				socket.emit('new message',{'user':me,'msg':mess});
+				$('#msg').val('');
+			}
+			else{alert("Empty message");}
+		});
+
+
+		socket.on('read message',function(data){
+			$('#messages').append(data.user,' : ',data.msg,'<br>');
+		})
+		socket.on('sound',function(){
+
+
+		
+        var audioElement = document.createElement('audio');
+        audioElement.setAttribute('src', 'sound.mp3');
+        audioElement.setAttribute('autoplay', 'autoplay');
+        //audioElement.load()
+        $.get();
+        audioElement.addEventListener("load", function() {
+        audioElement.play();
+        }, true);
+    
+
+
+
+
+
+		})
+	
+		
+
+	})
+	</script>
+</head>
+<body>
+	<br>
+	<div class="container">
+		<div class="row" id="main" style="display: none;">
+			<div class="col-md-4">
+				<div class="well">
+					<div class="card">
+    					<div class="card-header">
+    						Online Users <i id="opl"> </i>
+    					</div>
+    					<div class=" card-block" id="ousers">
+    						
+    					</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="card">
+					<div class="card-header">
+						Messages						
+					</div>
+					<div class="card-block">
+						<div id="messages">
+							
+						</div>	
+						<div id="typ"> </div>
+						<br>
+						<form class="form-inline">
+							<input type="text" name="msg" id="msg" class="form-control" placeholder="Enter Your message" />
+							<br>
+							<input type="submit" name="submit" id="msgs" value="Send" class="btn btn-primary" />
+						</form>				
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<div id="ask" class="card card-block" style="display: none;">
+			<input type="text" name="user" id="user" class="form-control" placeholder="What is your username ?" />
+			<br>
+			<input type="submit" name="submit" id="sub" class="btn btn-danger" value="Enter Chat" />
+			
+		</div>
+
+	</div>
+</body>
+</html>
